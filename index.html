@@ -16,46 +16,63 @@
       //   画板的高度等于文档的高度
       canvas.height = document.documentElement.clientHeight;
       let ctx = canvas.getContext("2d");
+      ctx.fillStyle = "black";
+      ctx.lineWidth = 10;
+      //   把线两端变圆润就减少锯齿感
+      ctx.lineCap = "round";
       // 定义一个开关默认false
       let painting = false;
-      ctx.fillStyle = "black";
-      //   ctx.strokeStyle = "none";
-      //   鼠标放下开关等于true,
-      canvas.onmousedown = () => {
-        painting = true;
-      };
-      //   鼠标松开开关等于false,
-      canvas.onmouseup = () => {
-        painting = false;
-      };
+      //   定义一个用来标记的变量
+      let last;
+      //   画线段
+      function drawLine(x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
       //   监听是否是触摸设备
       let isTouchDevice = "ontouchstart" in document.documentElement;
       console.log(isTouchDevice);
       if (isTouchDevice) {
+        //   触摸开始
+        canvas.ontouchstart = (e) => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          //   记录下触摸开始的位置
+          last = [x, y];
+        };
         canvas.ontouchmove = (e) => {
           let x = e.touches[0].clientX;
           let y = e.touches[0].clientY;
           //   console.log(x, y);
-          ctx.beginPath();
-          ctx.arc(x, y, 4, 0, 2 * Math.PI);
-          ctx.stroke();
-          //   填充
-          ctx.fill();
+          drawLine(last[0], last[1], x, y);
+          // 更新上一个标记的位置
+          last = [x, y];
         };
       } else {
+        //   鼠标放下开关等于true,
+        canvas.onmousedown = (e) => {
+          painting = true;
+          // 第一次没有上一次，所以把鼠标按下的开始作为标记点
+          last = [e.clientX, e.clientY];
+        };
         //   鼠标滑动传给参数e
         canvas.onmousemove = (e) => {
           //   如果开关等于true就画矩形，false就什么都不做
           if (painting === true) {
             // 画矩形
             //   ctx.fillRect(e.clientX - 5, e.clientY - 5, 10, 10);
-            ctx.beginPath();
-            ctx.arc(e.clientX, e.clientY, 4, 0, 2 * Math.PI);
-            ctx.stroke();
-            //   填充
-            ctx.fill();
-          } else {
+            // 传参画线段
+            drawLine(last[0], last[1], e.clientX, e.clientY);
+            // 更新上一个标记的位置
+            last = [e.clientX, e.clientY];
           }
+        };
+        //   鼠标松开开关等于false,
+        canvas.onmouseup = () => {
+          painting = false;
         };
       }
     </script>
