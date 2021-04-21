@@ -8,28 +8,39 @@
     <title>画板</title>
   </head>
   <body>
-    <div id="canvas"></div>
+    <canvas id="canvas"></canvas>
     <script>
-      canvas.onclick = (e) => {
-        // console.log(e);
-        // 获得鼠标点击时的坐标
-        // console.log(e.clientX);
-        // console.log(e.clientY);
-        let div = document.createElement("div");
-        div.style.position = "absolute";
-        div.style.left = e.clientX + "px";
-        div.style.top = e.clientY + "px";
-        div.style.border = "1px solid red";
-        div.style.width = "6px";
-        div.style.height = "6px";
-        // 居中 中心是鼠标点击的位置
-        div.style.marginLeft = "-3px";
-        div.style.marginTop = "-3px";
-        // 变成圆形
-        div.style.borderRadius = "50%";
-        div.style.background = "red";
-        // canvas添加一个div
-        canvas.appendChild(div);
+      var canvas = document.getElementById("canvas");
+      //   画板的宽度等于文档的宽度
+      canvas.width = document.documentElement.clientWidth;
+      //   画板的高度等于文档的高度
+      canvas.height = document.documentElement.clientHeight;
+      let ctx = canvas.getContext("2d");
+      // 定义一个开关默认false
+      let painting = false;
+      ctx.fillStyle = "black";
+      //   ctx.strokeStyle = "none";
+      //   鼠标放下开关等于true,
+      canvas.onmousedown = () => {
+        painting = true;
+      };
+      //   鼠标松开开关等于false,
+      canvas.onmouseup = () => {
+        painting = false;
+      };
+      canvas.onmousemove = (e) => {
+        //   如果开关等于true就画矩形，false就什么都不做
+        if (painting === true) {
+          // 画矩形
+          //   ctx.fillRect(e.clientX - 5, e.clientY - 5, 10, 10);
+          ctx.beginPath();
+          ctx.arc(e.clientX, e.clientY, 4, 0, 2 * Math.PI);
+          ctx.stroke();
+          //   填充
+          ctx.fill();
+        } else {
+          console.log("停止");
+        }
       };
     </script>
   </body>
